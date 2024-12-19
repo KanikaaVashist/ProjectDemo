@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key-Value Lookup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Key-Value Lookup</h2>
+        <input type="text" id="keyInput" placeholder="Enter your Key here :">
+        <button onclick="findValue()">Find Value</button>
+        <div id="response" class="response"></div>
+    </div>
+
+    <script>
+        async function findValue() {
+            const key = document.getElementById("keyInput").value.trim();
+            const responseDiv = document.getElementById("response");
+
+            responseDiv.textContent = "";
+
+            if (!key) {
+                responseDiv.textContent = "OOPS! Please Enter the KEY...";
+                responseDiv.className = "response error";
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:8080/search/value?key=${encodeURIComponent(key)}`);
+
+                if (response.ok) {
+                    const value = await response.text();
+                    responseDiv.textContent = `Value: ${value}`;
+                    responseDiv.className = "response success";
+                } else {
+                    responseDiv.textContent = `KEY '${key}' not found!`;
+                    responseDiv.className = "response error";
+                }
+            } catch (error) {
+                responseDiv.textContent = `ERROR! ${error.message}`;
+                responseDiv.className = "response error";
+            }
+        }
+    </script>
+</body>
+
+</html>
