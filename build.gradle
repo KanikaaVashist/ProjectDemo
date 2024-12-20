@@ -34,13 +34,13 @@ test {
 
 
 test {
-    useJUnitPlatform()  // Ensure JUnit 5 is used for tests
-    systemProperty "mockito.agent", "true" // Add this line
+    useJUnitPlatform()
+    systemProperty "mockito.agent", "true"
 }
 
 test {
   useJUnitPlatform()
-  systemProperty "mockito.agent", "true" // Add this line
+  systemProperty "mockito.agent", "true"
 }
 
 tasks.named('test') {
