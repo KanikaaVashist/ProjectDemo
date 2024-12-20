@@ -19,20 +19,29 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	testImplementation 'org.mockito:mockito-core:5.6.0'
-    testImplementation 'org.mockito:mockito-inline:5.6.0' //added
+	implementation 'javax.annotation:javax.annotation-api:1.3.2'
+	testImplementation 'org.mockito:mockito-core:4.0.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	
 }
 
 test {
-    jvmArgs += "-XX:+EnableDynamicAgentLoading"
+    useJUnitPlatform()
+    jvmArgs '-javaagent:' + configurations.testRuntimeClasspath.asPath
+}
+
+
+
+test {
+    useJUnitPlatform()  // Ensure JUnit 5 is used for tests
+    systemProperty "mockito.agent", "true" // Add this line
 }
 
 test {
-    jvmArgs += "-Djdk.instrument.traceUsage"
+  useJUnitPlatform()
+  systemProperty "mockito.agent", "true" // Add this line
 }
-
 
 tasks.named('test') {
 	useJUnitPlatform()
