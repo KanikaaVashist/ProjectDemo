@@ -1,4 +1,4 @@
-package com.example.ProjectUsingWatcher;
+package com.example.Watcher;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +35,7 @@ public class ControllerTests {
     public void setUp() {
         
         mockKeyValuePairs.put("testKey", "testValue");
-        mockKeyValuePairs.put("testKey2", "testValue2");
+        mockKeyValuePairs.put(":test $Key2 *", "/@test Value 2 ^");
         mockKeyValuePairs.put("testKey3", "testValue3");
     }
 
@@ -58,13 +58,13 @@ public class ControllerTests {
     @Test
     public void testGetValue_AnotherExistingKey() throws Exception {
         
-        when(controller.getValue("testKey2")).thenReturn(mockKeyValuePairs.get("testKey2"));
+        when(controller.getValue(":test $Key2 *")).thenReturn(mockKeyValuePairs.get(":test $Key2 *"));
 
         
-        mockMvc.perform(get("/search/value?key=testKey2"))
+        mockMvc.perform(get("/search/value?key=:test $Key2 *"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().string("testValue2"));
+                .andExpect(content().string("/@test Value 2 ^"));
     }
 
     @Test
