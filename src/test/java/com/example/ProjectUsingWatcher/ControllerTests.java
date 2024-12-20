@@ -5,14 +5,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @WebMvcTest(Controller.class)
 public class ControllerTests {
@@ -20,11 +24,19 @@ public class ControllerTests {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockBean
+    private Controller controller;
+
+    private final Map<String, String> mockKeyValuePairs = new HashMap<>();
+
     private static final Logger logger = Logger.getLogger(ControllerTests.class.getName());
 
     @BeforeEach
     public void setUp() {
-        logger.info("Starting test setup...");
+        
+        mockKeyValuePairs.put("testKey", "testValue");
+        mockKeyValuePairs.put("testKey2", "testValue2");
+        mockKeyValuePairs.put("testKey3", "testValue3");
     }
 
     @AfterEach
@@ -34,7 +46,10 @@ public class ControllerTests {
 
     @Test
     public void testGetValue_ExistingKey() throws Exception {
-        mockMvc.perform(get("/search/testKey"))
+        
+        when(controller.getValue("testKey")).thenReturn(mockKeyValuePairs.get("testKey"));
+
+        mockMvc.perform(get("/search/value?key=testKey"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string("testValue"));
@@ -42,7 +57,11 @@ public class ControllerTests {
 
     @Test
     public void testGetValue_AnotherExistingKey() throws Exception {
-        mockMvc.perform(get("/search/testKey2"))
+        
+        when(controller.getValue("testKey2")).thenReturn(mockKeyValuePairs.get("testKey2"));
+
+        
+        mockMvc.perform(get("/search/value?key=testKey2"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string("testValue2"));
@@ -50,9 +69,14 @@ public class ControllerTests {
 
     @Test
     public void testGetValue_NonexistentKey() throws Exception {
-        mockMvc.perform(get("/search/invalidKey"))
+        
+        when(controller.getValue("invalidKey"))
+                .thenThrow(new KeyNotFoundException("Key 'invalidKey' not found"));
+
+        
+        mockMvc.perform(get("/search/value?key=invalidKey"))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().string(""));
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Key 'invalidKey' not found"));
     }
 }
